@@ -1,4 +1,4 @@
-## STEPS I DID FOR INSTALLING AND CONFIGURING OPNSESNE FIREWALL
+## STEPS I DID FOR INSTALLING AND CONFIGURING OPNSENSE FIREWALL
 * **STEP1**
 * Install the iso file of opnsense and install it in virtualbox and open network settings
 * Then SET adapter1(LAN) to NAT_NETWORK:SOC_LAB(isolated network )And enable adapter 2(WAN) and SET to Bridged Adapter for accessing home router
