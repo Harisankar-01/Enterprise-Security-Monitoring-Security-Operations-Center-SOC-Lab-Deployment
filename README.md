@@ -1,13 +1,13 @@
 # Security Operations Centre(SOC) Lab Deployment
 A multi-layered virtual SOC sandbox (Wazuh, Sysmon, Suricata, OPNsense) deployed on Kali Linux and Windows Server 2022 to engineer log pipelines and map live threat detections to the MITRE ATT&amp;CK framework.
 
-# Wazuh-SOC-Lab-Pipeline-Engineering
+# SOC-Lab-Pipeline-Engineering
 
 A multi-layered Virtual Security Operations Center (vSOC) sandbox environment engineered to aggregate, decode, and analyze multi-vector threat activity in real time. This project demonstrates end-to-end log pipeline engineering, passive network monitoring, security architecture validation, and custom detection engineering mapped to the **MITRE ATT&CK Framework**.
 
 ---
 
-## 🏗️ Architecture Blueprint & Data Flow
+## Architecture Blueprint & Data Flow
 
 The infrastructure is built inside an isolated **VirtualBox NAT Network** (`SOC_Lab`) to guarantee safe execution and containment of simulated threats. A single, resource-efficient **Kali Linux** node serves a dual role as both the offensive testing instance and the centralized hosting core for the defensive security stack.
 
@@ -48,7 +48,7 @@ The infrastructure is built inside an isolated **VirtualBox NAT Network** (`SOC_
 
 ---
 
-## 🛠️ Technology Stack & Telemetry Mapping
+##  Technology Stack & Telemetry Mapping
 
 | Component | Technology | Security Visibility Value Provided |
 | :--- | :--- | :--- |
@@ -135,26 +135,39 @@ Because OPNsense uses a unique comma-separated structure (`filterlog`), custom X
 
 ---
 
-## ⚔️ Cyber Threat Simulations & Incident Reports
-
-To validate the defense-in-depth architecture, a multi-stage simulation was executed from the offensive Kali environment targeting the Windows Server.
-
+##  Cyber Threat simulations
 ### Use Case 1: Active Network Reconnaissance
-* **Tactical Simulation:** Executed an aggressive host fingerprinting and port sweep using `nmap -Pn -sV` against the target.
-* **Telemetry Correlation:** 
-  * **OPNsense Firewall** immediately dropped unauthorized interface access attempts, recording hits under Custom Rule `100201`.
-  * **Suricata IDS** simultaneously triggered signature match exceptions for network layer reconnaissance, exposing the attacking machine's IP.
+* **Tactical Simulation:** Executed a nmap scan using ` sudo nmap -sS 192.168.1.9` against the target endpoint from kali linux machine to determine the active ports of the endpoint and found the open rdp 3389.
+* **Telemetry Correlation:**
+  * **Suricata IDS** triggered an "ET SCAN Possible Nmap User-Agent" signature match, exposing the attacking machine's source IP and the probed destination.
+  * **Opnsense Firewall** Captured the network traffic from attacker machine to endpoint exposing the dataflow,ip and other packet details
+  * **Wazuh** ingested the Suricata alert, surfacing it in the threat-hunting dashboard for correlation against subsequent events.
 
-### Use Case 2: Malicious Payload Drop & FIM Execution
-* **Tactical Simulation:** A script simulation forced an outbound web connection to drop an executable file directly inside the server's monitored `Downloads` folder, followed by executing the script via an internal command path.
-* **Telemetry Correlation:** 
-  * **Wazuh FIM (`syscheck`)** instantly blared a high-priority alert flagging a raw hash modification inside the protected repository directory path.
-  * **Sysmon (Event ID 1)** captured the exact execution parameters, tracking the complete parent-child process tree mapping back to `powershell.exe`.
+### Use Case 2: Credential Brute Force & Account Compromise
+* **Tactical Simulation:** Launched a dictionary-based brute-force attack against the RDP service using `Hydra` with a custom wordlist, driving repeated authentication attempts against the local administrator account and found Credentials.
+* **Telemetry Correlation:**
+  * **Windows Security Log** recorded a sustained burst of Event ID 4625 (logon failure) entries from the same source IP, followed by a single Event ID 4624 (logon success).
+  * **Wazuh Rule 60204** ("Multiple Windows Logon Failures," Level 10) correlated the failed-logon burst into a single high-severity alert, flagging the account under active attack prior to compromise.
+    
 
+### Use Case 3: Persistence via Unauthorized Local Administrator
+* **Tactical Simulation:** Using the compromised administrator credentials established a rdp connection using remmina(rdp client), created a new local user account and escalated it into the local Administrators group to establish independent, persistent access.
+* **Telemetry Correlation:**
+  * **Windows Security Log** captured Event ID 4720 (account created) and Event ID 4732 (member added to a security-enabled local group), both attributed back to the compromised administrator account.
+  * **Sysmon (Event ID 1)** captured the exact `net user` and `net localgroup` command lines, tracking the process lineage back to the interactive RDP session.
+
+### Use Case 4: Post-Compromise Account Discovery
+* **Tactical Simulation:** Executed a local account enumeration command (`net user`) from within the compromised session to simulate attacker reconnaissance of the internal environment.
+* **Telemetry Correlation:**
+  * **Sysmon (Event ID 1)** logged the full command line and parent process, confirming execution context within the compromised administrator session.
+  * **Wazuh** classified the activity as discovery behavior, correlating it against the prior persistence event as part of the same attacker session.
 ---
 
 ## 🧠 Key Takeaways & Defense-in-Depth Lessons
-This project highlights the core industry principle of **Defense-in-Depth**. Firewalls are designed to monitor boundaries, but attackers routinely bypass them using open service ports or compromised credentials. By layering perimeter filtering (**OPNsense**) with network stream inspection (**Suricata**) and continuous endpoint evaluation (**Sysmon / Wazuh FIM**), the infrastructure maintains complete tactical visibility over an adversary even if the outer perimeter defenses completely fail.
+## Key Takeaways
+
+This project demonstrates a core industry principle: defense in depth, and the real-world consequences of improperly configured systems and security controls. Firewalls are designed to monitor and enforce boundaries, but attackers routinely bypass them entirely through open service ports, exposed services, or compromised credentials, as this lab demonstrated when RDP brute force succeeded without ever touching the perimeter firewall.
+No single security layer is sufficient on its own. When systems are deployed with weak authentication policies, unrestricted service exposure, and no correlation across log sources, attackers gain a significant advantage, moving from initial reconnaissance to full compromise and persistence with minimal resistance. This lab reinforces that effective detection depends not just on having security tools in place, but on configuring them correctly, enforcing policies like account lockout and MFA, and ensuring logs from every layer (network, host, and firewall) are synchronized and correlated so an attack can be traced end-to-end rather than observed as isolated, disconnected events.
 
 <div>
 <img src="https://img.shields.io/badge/-Wazuh-3A75C4?&style=for-the-badge&logo=wazuh&logoColor=white" />
