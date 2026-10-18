@@ -1,10 +1,8 @@
 ## Installation
 * Installed kali from <a href="https://www.kali.org/get-kali/#kali-platforms">Official Website</a>
-* **VM SETUP**
-  configured on virtualbox and set network to NAT-Network : SOC-LAB to isolate it from Host Machine
   
 ##  Network Configuration
-* Configured Network setting on Virtualbox of Kali to Nat_Network named:SOC_LAB
+* Changed The Network setting of Kali to a isolated Nat Network named:SOC_LAB to isolate it from Host Machine
 * Set a static ip configuration:
 * 
 ```bash
