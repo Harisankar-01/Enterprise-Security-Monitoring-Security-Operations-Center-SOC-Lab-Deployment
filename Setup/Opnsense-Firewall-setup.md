@@ -1,5 +1,5 @@
 ## STEPS I DID FOR INSTALLING AND CONFIGURING OPNSENSE FIREWALL
-* **STEP1**
+## Step 1
 * Install the iso file of opnsense and install it in virtualbox and open network settings
 * Then SET adapter1(LAN) to NAT_NETWORK:SOC_LAB(isolated network )And enable adapter 2(WAN) and SET to Bridged Adapter for accessing home router
 * run the VM and complete the installation SET LAN and WAN
@@ -12,7 +12,7 @@ By default, an enterprise-grade perimeter firewall drops thousands of malicious 
 
 ---
 
-### Step 1: Configure OPNsense to Send Remote Logs
+### Step 2: Configure OPNsense to Send Remote Logs
 
 To prevent our SIEM indexer from getting overwhelmed with useless data in a lab environment, we explicitly configure OPNsense to stream **blocked traffic only** (boundary drop telemetry).
 
@@ -26,11 +26,12 @@ To prevent our SIEM indexer from getting overwhelmed with useless data in a lab 
    * **Levels:** Select `info` and `notice` *(or leave blank to send all priority values)*.
    * **Hostname / IP:** Type your **Kali Linux Wazuh Server IP Address**.
    * **Port:** `514`
+   *  **rfc3164** ✅
 5. Click **Save** and then click the **Apply** button at the top of the interface to fire up the remote logging data pipeline.
 
 ---
 
-### Step 2: Open the UDP Syslog Receiver on the Wazuh Server
+### Step 3: Open the UDP Syslog Receiver on the Wazuh Server
 
 By default, the central Wazuh Manager blocks outside syslog feeds to remain secure. We must configure the manager on our **Kali Linux box** to listen for the incoming UDP packets streaming from OPNsense.
 
@@ -57,7 +58,7 @@ By default, the central Wazuh Manager blocks outside syslog feeds to remain secu
 
 ---
 
-### Step 3: Verify the Interface Socket Binding
+### Step 4: Verify the Interface Socket Binding
 
 To prove that the pipeline isn't blocked on the host system layer, verify that `wazuh-remoted` successfully claimed the socket using the terminal network utility tool:
 
@@ -84,5 +85,7 @@ Once your custom rules (defined in `local_rules.xml`) parse the comma-separated 
    rule.id: 100201 OR rule.id: 100202
    ```
 4. Click **Refresh**. The interface will display custom formatted alerts detailing **"OPNsense Firewall: Inbound connection attempt BLOCKED"**, mapping out foreign port scans or unauthorized ingress traffic sweeps instantly!
+
+notes: if udp not working use TCP instead.
 
   
