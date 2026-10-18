@@ -4,10 +4,10 @@ installed (Wazuh all in one) by executing the following command:
 curl -sO https://packages.wazuh.com/4.9/wazuh-install.sh
 sudo bash ./wazuh-install.sh -a
 ```
-then opened the webui from the below link and entered credentials and opened dashboard
+then opened the webui from the below link and entered credentials generated and opened dashboard
 
 ```
-https://192.168.1.5
+https://127.0.0.1/
 ```
 And Check services by executing these commands:
 
