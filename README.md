@@ -56,7 +56,7 @@ The infrastructure is built inside an isolated **VirtualBox NAT Network** (`SOC_
 | **Perimeter Security** | **OPNsense Firewall** | Filters boundary network access and logs dropped inbound connection rules. |
 | **Network IDS** | **Suricata NIDS** | Performs deep packet inspection on the virtual interface to catch exploits in transit. |
 | **Endpoint Target** | **Windows Server 2022** | Acts as the enterprise crown-jewel node holding sensitive simulated directory assets. |
-| **Host Telemetry** | **Microsoft Sysmon** | Records granular execution logs (Parent-Child tracking, terminal arguments). |
+| **Host Telemetry** | **Microsoft Sysmon,other Windows application,authentication and securtity logs** | Records granular execution logs (Parent-Child tracking, terminal arguments). |
 | **Data Integrity** | **Wazuh FIM (`syscheck`)** | Real-time tracking of unauthorized changes in the file system (`Downloads`). |
 
 ---
@@ -88,13 +88,13 @@ Suricata is configured on the Kali interface in promiscuous mode to monitor comm
 ```
 
 ### 3. Perimeter Log Streaming (OPNsense)
-OPNsense is configured via its Remote Syslog options to stream boundary packet logs to the Wazuh Server's IP address. To catch these, the Wazuh Manager's master syslog listener was opened up over UDP Port 514:
+OPNsense is configured via its Remote Syslog options to stream boundary packet logs to the Wazuh Server's IP address. To catch these, the Wazuh Manager's master syslog listener was opened up over TCP Port 514:
 ```xml
 <remote>
   <connection>syslog</connection>
   <port>514</port>
-  <protocol>udp</protocol>
-  <allowed-ips>0.0.0.0/0</allowed-ips>
+  <protocol>tcp</protocol>
+  <allowed-ips>192.168.1.5</allowed-ips>
 </remote>
 ```
 
@@ -108,7 +108,7 @@ Because OPNsense uses a unique comma-separated structure (`filterlog`), custom X
 <group name="opnsense_firewall,">
 
   <!-- Parent Rule: This flags when any OPNsense log arrives -->
-  <rule id="100200" level="0">
+  <rule id="100200" level="1">
     <decoded_as>syslog</decoded_as>
     <match>filterlog</match>
     <description>OPNsense raw firewall event tracker.</description>
@@ -157,10 +157,11 @@ Because OPNsense uses a unique comma-separated structure (`filterlog`), custom X
   * **Sysmon (Event ID 1)** captured the exact `net user` and `net localgroup` command lines, tracking the process lineage back to the interactive RDP session.
 
 ### Use Case 4: Post-Compromise Account Discovery
-* **Tactical Simulation:** Executed a local account enumeration command (`net user`) from within the compromised session to simulate attacker reconnaissance of the internal environment.
+* **Tactical Simulation:** Executed a local account enumeration command (`net user`) from within the compromised session to simulate attacker reconnaissance of the internal environment. From powershell dropped a file named malware.exe to the downloads folder 
 * **Telemetry Correlation:**
-  * **Sysmon (Event ID 1)** logged the full command line and parent process, confirming execution context within the compromised administrator session.
+  * **Sysmon (Event ID 1)** logged the full command line and parent process of both executions, confirming execution context within the compromised administrator session.
   * **Wazuh** classified the activity as discovery behavior, correlating it against the prior persistence event as part of the same attacker session.
+  * **wazuh FIM** tracked the file download and alerts that a file added to the downloads folder.
 ---
 
 ## 🧠 Key Takeaways & Defense-in-Depth Lessons
