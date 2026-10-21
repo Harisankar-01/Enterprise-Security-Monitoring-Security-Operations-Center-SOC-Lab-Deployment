@@ -21,7 +21,7 @@
 - Destination IP: 192.168.1.9 (Windows Server target)
 - Destination service: RDP (3389)
 - 
-**alert fired:**
+**Alert fired:**
 | Field | Value |
 |---|---|
 | Time | Oct 21, 2026 @ 19:40:28.776 |
@@ -30,6 +30,8 @@
 | rule.id | 86601 |
 | data.alert.category | Web Application Attack |
 
+**Triage verdict:**
+True positive. Checked firewall (OPNsense) logs and confirmed this was expected lab traffic from the known attacker host, not an external threat. In a production environment, this would be classified as reconnaissance against an exposed RDP service and investigated as a precursor to a brute-force or exploitation attempt.
 
 **MITRE ATT&CK mapping:**
 - T1595.002 — Active Scanning: Vulnerability Scanning (service-version detection via `-sV`)
