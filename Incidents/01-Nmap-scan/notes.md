@@ -1,4 +1,3 @@
-
 # 01 - Active Network Reconnaissance (Nmap Scan)
 
 **Command executed:**
@@ -30,7 +29,7 @@
 | rule.id | 86601 |
 | data.alert.category | Web Application Attack |
 
-**Observation**
+**Observation:**
 The scan triggered multiple independent Suricata signatures, demonstrating that a single reconnaissance action can generate several detections across protocols, underscoring the value of broad signature coverage during the discovery phase of an attack.”
 
 **Triage verdict:**
