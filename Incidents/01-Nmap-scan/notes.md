@@ -30,6 +30,9 @@
 | rule.id | 86601 |
 | data.alert.category | Web Application Attack |
 
+**Observation**
+The scan triggered multiple independent Suricata signatures, demonstrating that a single reconnaissance action can generate several detections across protocols, underscoring the value of broad signature coverage during the discovery phase of an attack.”
+
 **Triage verdict:**
 True positive. Checked firewall (OPNsense) logs and confirmed this was expected lab traffic from the known attacker host, not an external threat. In a production environment, this would be classified as reconnaissance against an exposed RDP service and investigated as a precursor to a brute-force or exploitation attempt.
 
