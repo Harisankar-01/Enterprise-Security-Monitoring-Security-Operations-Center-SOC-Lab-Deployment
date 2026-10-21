@@ -14,7 +14,7 @@
 | rule.groups | windows, windows_security, authentication_failed |
 | rule.description | Logon Failure - Unknown user or bad password |
 | data.win.system.eventID | 4625 |
-| data.src_ip | 192.168.1.5 |
+| data.win.eventdata.ipAddress | 192.168.1.5 |
 | Count | 6 failed attempts from same source |
 
 **Alert 2 — Correlated Brute Force Detection**
