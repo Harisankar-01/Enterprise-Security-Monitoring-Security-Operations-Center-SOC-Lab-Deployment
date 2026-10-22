@@ -13,7 +13,19 @@ The infrastructure is built inside an isolated **VirtualBox NAT Network** (`SOC_
 
 ### 🌐 Logical Network Topology
 
+``mermaid
+flowchart TD
+    NET[Internet / Home Router] -->|WAN: Bridged Adapter| FW
 
+    FW["OPNsense Firewall<br/>LAN: 192.168.1.1"]
+
+    FW --- LAN{{"SOC-LAB Network<br/>192.168.1.0/24"}}
+
+    LAN --- KALI["Kali Linux<br/>192.168.1.5<br/>• Wazuh Manager / SIEM<br/>• Suricata NIDS<br/>• Attacker tools"]
+    LAN --- WIN["Windows Server 2022<br/>192.168.1.9<br/>• Wazuh Agent<br/>• Sysmon<br/>• Security / System / Application logs"]
+
+    WIN -. "Sysmon + Windows event logs" .-> KALI
+    
 ##  Technology Stack & Telemetry Mapping
 
 | Component | Technology | Security Visibility Value Provided |
