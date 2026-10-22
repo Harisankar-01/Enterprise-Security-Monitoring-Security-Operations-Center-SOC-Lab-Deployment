@@ -34,7 +34,7 @@ A simulated enterprise attack chain was investigated in a home SOC lab environme
 
 ---
 ```text
-## 3. Attack Chain
+Attack Chain
 
 Attacker (Kali, 192.168.1.5) scans target
 ↓
@@ -46,11 +46,11 @@ Multiple logon failures → Wazuh correlated alert (Rule 60204, Level 10)
 ↓
 Successful RDP logon with compromised administrator credentials (Event 4624)
 ↓
-Attacker connects via Remmina (RDP client) and opens PowerShell
+Attacker connects via RDP and opens PowerShell
 ↓
 Local user “hacker123” created and added to Administrators group (persistence)
 ↓
-Discovery command (net user) executed to enumerate accounts
+Discovery command (net users) executed to enumerate accounts
 ↓
 File dropped in Downloads folder (Hacked.txt) → detected by Wazuh FIM
 
@@ -71,7 +71,7 @@ File dropped in Downloads folder (Hacked.txt) → detected by Wazuh FIM
 - Category: Web Application Attack
 - Timestamp: Oct 21, 2026 @ 19:40:28.776
 
-A single `nmap -sS -sV` scan generated two independent Suricata signatures roughly 40 seconds apart, confirming the scan touched multiple services (RDP and a web service) on the target.
+A single `nmap -sS -sV` scan generated two independent Suricata signatures roughly 40 seconds apart, confirming the scan touched multiple services on the target.
 
 ---
 
@@ -84,7 +84,7 @@ A single `nmap -sS -sV` scan generated two independent Suricata signatures rough
 | Host | WIN-F97ON0862EU (192.168.1.9) |
 | Attacker source | 192.168.1.5 (Kali Linux) |
 | Compromised account | Administrator |
-| Access method | RDP via Remmina, NTLM authentication |
+| Access method | RDP , NTLM authentication |
 | Execution | PowerShell / net1.exe, spawned from interactive RDP session |
 | Attack type | External scan → credential brute force → post-exploitation |
 | Initial vector | Exposed RDP service |
@@ -95,10 +95,10 @@ A single `nmap -sS -sV` scan generated two independent Suricata signatures rough
 |---|---|
 | 19:39:48 | Nmap scan (`nmap -sS -sV`) detected — ET SCAN RDP Connection Attempt from Nmap |
 | 19:40:28 | Second Suricata alert — ET SCAN Possible Nmap User-Agent Observed |
-| 19:55:18 – 20:01:30 | Repeated RDP logon failures from Hydra brute force (6 attempts, Event 4625) *(see Section 11 — timestamp ordering note)* |
+| 19:55:18 – 20:01:30 | Repeated RDP logon failures from Hydra brute force (6 attempts, Event 4625)|
 | 20:02:10 | Wazuh correlated alert: Multiple Windows Logon Failures (Rule 60204, Level 10) |
 | 20:02:11 | Successful RDP logon with Administrator credentials (Event 4624, NTLM) |
-| 20:24:15 | Attacker connects via Remmina; `net user hacker123 password@123 /add` and `net localgroup administrators hacker123 /add` executed |
+| 20:24:15 | Attacker connects via Rdp; `net user hacker123 password@123 /add` and `net localgroup administrators hacker123 /add` executed |
 | 20:24:15 | Sysmon flags discovery/execution activity (Rule 92033, 92039) |
 | 20:25:38 | Administrators Group Changed confirmed (Event 4732, Rule 60154, Level 12) |
 | 20:34:20 | `net user` executed — discovery activity (Sysmon Rule, Event ID 1) |
@@ -176,7 +176,7 @@ The attacker gained full administrative access to the target endpoint via brute-
 
 **9.1 Recommended Response Actions (Simulated)**
 
-As this was a controlled lab exercise, no live response was required; however, in a production environment the following actions would be taken based on the evidence collected:
+As this was a controlled lab exercise, no live response was taken; however, in a production environment the following actions would be taken based on the evidence collected:
 
 - Disable the compromised Administrator account and force a password reset
 - Disable and remove the unauthorized `hacker123` local account
@@ -193,20 +193,16 @@ As this was a controlled lab exercise, no live response was required; however, i
 - Enable PowerShell Script Block Logging and Module Logging for full command visibility
 - Alert on creation of new local accounts and additions to the Administrators group
 - Synchronize time sources (NTP) across all systems for reliable log correlation
+- review the security policy and harden them
 
 ---
 
 ## 10. Lessons Learned
 
-- OPNsense firewall logs could not be correlated with endpoint/IDS logs due to a timezone mismatch between systems, reinforcing the need for consistent NTP synchronization across all layers
-- Traffic between Kali and the Windows Server stayed within the same subnet, so it never passed through the OPNsense firewall, limiting that source's visibility into this attack
-- Wazuh's brute-force correlation rule (60204) triggered reliably with only 6 failed attempts, confirming the detection logic works well even at low attempt counts
-- A roughly 9-minute gap existed between the discovery command and the file drop, both attributed to the same session but logged independently, showing that Wazuh detects individual actions well but does not automatically chain them into a single attacker session — that correlation remains a manual analyst task
-- Sysmon's "account discovery" classification for `net.exe`/`net1.exe` activity did not distinguish between enumeration and account creation/modification, both were tagged similarly despite different intent and risk
+- OPNsense firewall logs could not be correlated with endpoint/IDS logs due to a timezone mismatch between systems, reinforcing the need for consistent NTP synchronization across all layers before any multi-source investigation can be trusted
+- Security policies should be reviewed regularly and strengthened proactively, rather than only after an incident exposes a gap, since this lab showed how quickly a single weak credential policy led to full compromise
+- Firewalls and IDS should be configured not just to log traffic, but to actively block known-malicious patterns and alert in real time; detection without a corresponding prevention or blocking rule only documents an attack after the fact
+- A strong password policy, combined with account lockout thresholds and MFA where possible, is essential, since this lab demonstrated that a brute-force attack with a small wordlist was sufficient to compromise a privileged account in under a minute
 
 ---
 
-## 11. Known Data Quality Observations
-
-- **Duplicate rule ID:** Both Suricata scan alerts in Section 4 shared rule.id 86601 despite differing descriptions and alert categories (Network Scan vs. Web Application Attack). This points to a rule-ID mapping inconsistency in this Suricata ruleset version. In production, relying on rule.id alone for filtering or deduplication would conflate unrelated detections; description, category, and SID should be checked together.
-- **Timestamp ordering (brute force):** The first logged 4625 (logon failure) events appear timestamped earlier (19:55:18) than the recorded Hydra launch time (20:01:30). This is most likely a clock or logging artifact rather than an actual pre-attack failure burst, and is noted here for transparency; the correlated Wazuh alert (20:02:10) and successful logon (20:02:11) remain the reliable anchor points for this scenario.
