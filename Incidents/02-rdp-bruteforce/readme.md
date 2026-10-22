@@ -50,3 +50,8 @@ True positive. Six consecutive logon failures against the Administrator account 
 
 **Detection gap / observation:**
 Wazuh's built-in rule correctly flagged the successful logon itself as a *"possible pass-the-hash attack"* due to the use of NTLM authentication over RDP. This is a default rule behavior worth noting: the alert correctly surfaces risky authentication methods even when the logon is legitimate-looking, but analysts should verify context (source IP, prior failed attempts) before escalating, since NTLM-over-RDP can also occur in benign configurations. The ~6-attempt threshold was sufficient to trigger Wazuh's correlation rule in this lab, which is lower than many real-world brute-force detection thresholds (often 8-10+), suggesting this ruleset is tuned conservatively for faster detection.
+
+
+**Post-Compromise Activities:**
+
+Using the credentials obtained through the RDP brute-force attack, I established an interactive session on Windows Server 2022 via Remmina (an RDP client), authenticating as the compromised Administrator account. From within this session, I opened PowerShell and carried out a sequence of post-exploitation actions: creating a new local administrator account to establish persistence independent of the original credentials, enumerating local accounts to simulate attacker reconnaissance, and dropping a file into the Downloads directory to test file-integrity detection. Each action was performed to validate whether the lab’s telemetry pipeline, Sysmon, Windows Security logs, and Wazuh FIM, could detect realistic attacker behavior following a successful credential compromise.
