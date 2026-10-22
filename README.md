@@ -25,7 +25,7 @@ flowchart TD
     LAN --- WIN["Windows Server 2022<br/>192.168.1.9<br/>• Wazuh Agent<br/>• Sysmon<br/>• Security / System / Application logs"]
 
     WIN -. "Sysmon + Windows event logs" .-> KALI
-    ```
+```
     
     
 ##  Technology Stack & Telemetry Mapping
