@@ -12,41 +12,7 @@ A multi-layered Virtual Security Operations Center (vSOC) sandbox environment en
 The infrastructure is built inside an isolated **VirtualBox NAT Network** (`SOC_Lab`) to guarantee safe execution and containment of simulated threats. A single, resource-efficient **Kali Linux** node serves a dual role as both the offensive testing instance and the centralized hosting core for the defensive security stack.
 
 ### 🌐 Logical Network Topology
-```text
-         [ Public Internet / Home Router ]
-                         │
-                 (Bridged Interface)
-                         ▼
-               ┌───────────────────┐
-               │ OPNsense Firewall │
-               └───────────────────┘
-                         │
-                   (NAT Network)
-            ┌────────────┴────────────┐
-            ▼                         ▼
-  ┌───────────────────┐     ┌───────────────────┐
-  │ Windows Server    │     │ Kali Linux        │
-  │ 2022 (Target)     │     │ (Attacker Box)    │
-  └───────────────────┘     └───────────────────┘
-            │          ▲              │          ▲
-            │          │              │          │
-     (Sysmon & FIM) (Syslog Logs) (Launches) (Hosts SIEM Core)
-            │          │           (Attacks)     │
-            ▼          │              │          ▼
-     ┌──────────────┐  │              │    ┌──────────────┐
-     │ Wazuh Agent  │──┼──────────────┘    │ Suricata IDS │
-     └──────────────┘  │                   └──────────────┘
-                       │                          │
-                       │                    (eve.json Log)
-                       │                          │
-                       ▼                          ▼
-               ┌──────────────────────────────────┐
-               │     Wazuh Server & Dashboard     │
-               │        (Hosted on Kali)          │
-               └──────────────────────────────────┘
-```
 
----
 
 ##  Technology Stack & Telemetry Mapping
 
