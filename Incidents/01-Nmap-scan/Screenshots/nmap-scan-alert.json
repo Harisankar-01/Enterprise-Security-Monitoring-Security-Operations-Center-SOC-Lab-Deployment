@@ -1,0 +1,116 @@
+{
+  "_index": "wazuh-alerts-4.x-2026.10.21",
+  "_id": "1S7MXqEBn9BOnwGBIWFx",
+  "_version": 1,
+  "_score": null,
+  "_source": {
+    "input": {
+      "type": "log"
+    },
+    "agent": {
+      "name": "kali",
+      "id": "000"
+    },
+    "manager": {
+      "name": "kali"
+    },
+    "data": {
+      "metadata": {
+        "flowbits": [
+          "ms.rdp.established"
+        ]
+      },
+      "app_proto": "rdp",
+      "ip_v": "4",
+      "in_iface": "eth0",
+      "src_ip": "192.168.1.5",
+      "src_port": "36986",
+      "event_type": "alert",
+      "alert": {
+        "severity": "3",
+        "signature_id": "2036252",
+        "rev": "1",
+        "metadata": {
+          "performance_impact": [
+            "Low"
+          ],
+          "affected_product": [
+            "Windows_XP_Vista_7_8_10_Server_32_64_Bit"
+          ],
+          "attack_target": [
+            "Client_and_Server"
+          ],
+          "updated_at": [
+            "2022_04_19"
+          ],
+          "confidence": [
+            "High"
+          ],
+          "created_at": [
+            "2022_04_19"
+          ],
+          "tag": [
+            "Description_Generated_By_Proofpoint_Nexus"
+          ],
+          "signature_severity": [
+            "Minor"
+          ],
+          "deployment": [
+            "Internal",
+            "Perimeter"
+          ]
+        },
+        "gid": "1",
+        "signature": "ET SCAN RDP Connection Attempt from Nmap",
+        "action": "allowed",
+        "category": "Detection of a Network Scan"
+      },
+      "flow_id": "1645724253800866.000000",
+      "dest_ip": "192.168.1.9",
+      "proto": "TCP",
+      "dest_port": "3389",
+      "pkt_src": "wire/pcap",
+      "flow": {
+        "src_ip": "192.168.1.5",
+        "src_port": "36986",
+        "pkts_toserver": "4",
+        "dest_ip": "192.168.1.9",
+        "start": "2026-10-21T19:39:41.579783+0530",
+        "bytes_toclient": "225",
+        "bytes_toserver": "314",
+        "pkts_toclient": "3",
+        "dest_port": "3389"
+      },
+      "timestamp": "2026-10-21T19:39:48.416858+0530",
+      "direction": "to_server"
+    },
+    "rule": {
+      "firedtimes": 15,
+      "mail": false,
+      "level": 3,
+      "description": "Suricata: Alert - ET SCAN RDP Connection Attempt from Nmap",
+      "groups": [
+        "ids",
+        "suricata"
+      ],
+      "id": "86601"
+    },
+    "location": "/var/log/suricata/eve.json",
+    "decoder": {
+      "name": "json"
+    },
+    "id": "1792591788.406716",
+    "timestamp": "2026-10-21T19:39:48.690+0530"
+  },
+  "fields": {
+    "timestamp": [
+      "2026-10-21T14:09:48.690Z"
+    ],
+    "data.timestamp": [
+      "2026-10-21T14:09:48.416Z"
+    ]
+  },
+  "sort": [
+    1792591788690
+  ]
+}
