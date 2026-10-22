@@ -13,7 +13,7 @@ The infrastructure is built inside an isolated **VirtualBox NAT Network** (`SOC_
 
 ### 🌐 Logical Network Topology
 
-``mermaid
+```mermaid
 flowchart TD
     NET[Internet / Home Router] -->|WAN: Bridged Adapter| FW
 
@@ -26,7 +26,7 @@ flowchart TD
 
     WIN -. "Sysmon + Windows event logs" .-> KALI
     ```
-    ---
+    
     
 ##  Technology Stack & Telemetry Mapping
 
