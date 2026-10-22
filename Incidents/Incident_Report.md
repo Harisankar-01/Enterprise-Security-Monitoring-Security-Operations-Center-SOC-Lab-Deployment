@@ -1,13 +1,13 @@
 # INCIDENT ANALYSIS REPORT
 ## Multi-Stage Network Compromise: Reconnaissance, Brute Force, Persistence & Discovery
 
-**Incident ID:** SOC-LAB-001
-**Classification:** Training / Simulated Incident
-**Severity:** High
-**Status:** Closed
-**Environment:** Home SOC Lab (VirtualBox — Kali Linux, Windows Server 2022, OPNsense, Suricata, Wazuh, Sysmon)
-**Analyst:** Hari
-**Date:** October 21, 2026
+* **Incident ID:** SOC-LAB-001
+* **Classification:** Training / Simulated Incident
+* **Severity:** High
+* **Status:** Closed
+* **Environment:** Home SOC Lab (VirtualBox — Kali Linux, Windows Server 2022, OPNsense, Suricata, Wazuh, Sysmon)
+* **Analyst:** Harisankar
+* **Date:** October 21, 2026
 
 ---
 
@@ -33,7 +33,7 @@ A simulated enterprise attack chain was investigated in a home SOC lab environme
 | Analyst | Hari |
 
 ---
-
+```text
 ## 3. Attack Chain
 
 Attacker (Kali, 192.168.1.5) scans target
@@ -54,7 +54,7 @@ Discovery command (net user) executed to enumerate accounts
 ↓
 File dropped in Downloads folder (Hacked.txt) → detected by Wazuh FIM
 
-
+```
 ---
 
 ## 4. Initial Detection
