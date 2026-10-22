@@ -5,6 +5,10 @@ A multi-layered virtual SOC sandbox (Wazuh, Sysmon, Suricata, OPNsense) deployed
 
 A multi-layered Virtual Security Operations Center (vSOC) sandbox environment engineered to aggregate, decode, and analyze multi-vector threat activity in real time. This project demonstrates end-to-end log pipeline engineering, passive network monitoring, security architecture validation, and custom detection engineering mapped to the **MITRE ATT&CK Framework**.
 
+# Core Objective Of The Project
+
+This project aims to demonstrate how weak security configurations, exposed services, poor password policies give attackers a practical advantage in gaining and maintaining access to a system. By building a full detection pipeline and simulating a realistic attack chain against it, this lab highlights the importance of defense in depth: no single security control is sufficient on its own, and only layered, properly configured monitoring across the network, host, and firewall can provide reliable visibility into an attacker's actions from initial access through persistence.
+
 ---
 
 ## Architecture Blueprint & Data Flow
@@ -80,7 +84,7 @@ OPNsense is configured via its Remote Syslog options to stream boundary packet l
 
 ---
 
-## 🚀 Custom Detection Engineering (Rules XML)
+## Custom Detection Engineering (Rules XML)
 
 Because OPNsense uses a unique comma-separated structure (`filterlog`), custom XML detection logic was authored and injected into `/var/ossec/etc/rules/local_rules.xml` on the Wazuh Manager to extract meaningful security insights and separate permitted traffic from perimeter blocks:
 
@@ -117,7 +121,7 @@ Because OPNsense uses a unique comma-separated structure (`filterlog`), custom X
 
 ##  Cyber Threat simulations
 ### Use Case 1: Active Network Reconnaissance
-* **Tactical Simulation:** Executed a nmap scan using ` sudo nmap -sS 192.168.1.9` against the target endpoint from kali linux machine to determine the active ports of the endpoint and found the open rdp 3389.
+* **Tactical Simulation:** Executed a nmap scan using ` sudo nmap -sS -sV 192.168.1.9` against the target endpoint from kali linux machine to determine the active ports of the endpoint and found the open rdp 3389.
 * **Telemetry Correlation:**
   * **Suricata IDS** triggered an "ET SCAN Possible Nmap User-Agent" signature match, exposing the attacking machine's source IP and the probed destination.
   * **Opnsense Firewall** Captured the network traffic from attacker machine to endpoint exposing the dataflow,ip and other packet details
@@ -136,15 +140,14 @@ Because OPNsense uses a unique comma-separated structure (`filterlog`), custom X
   * **Windows Security Log** captured Event ID 4720 (account created) and Event ID 4732 (member added to a security-enabled local group), both attributed back to the compromised administrator account.
   * **Sysmon (Event ID 1)** captured the exact `net user` and `net localgroup` command lines, tracking the process lineage back to the interactive RDP session.
 
-### Use Case 4: Post-Compromise Account Discovery
-* **Tactical Simulation:** Executed a local account enumeration command (`net user`) from within the compromised session to simulate attacker reconnaissance of the internal environment. From powershell dropped a file named malware.exe to the downloads folder 
+### Use Case 4: Post-Compromise Account Discovery & File Drop
+* **Tactical Simulation:** Executed a local account enumeration command (`net user`) from within the compromised session to simulate attacker reconnaissance of the internal environment, followed by writing a file directly into the Administrator's Downloads folder using `"You Are Hacked" | Out-File -FilePath "C:\Users\Administrator\Downloads\Hacked.txt"`.
 * **Telemetry Correlation:**
-  * **Sysmon (Event ID 1)** logged the full command line and parent process of both executions, confirming execution context within the compromised administrator session.
-  * **Wazuh** classified the activity as discovery behavior, correlating it against the prior persistence event as part of the same attacker session.
-  * **wazuh FIM** tracked the file download and alerts that a file added to the downloads folder.
+  * **Sysmon (Event ID 1)** logged the full command line and parent process for the discovery command, confirming execution context within the compromised administrator session.
+  * **Wazuh** classified the `net user` activity as discovery behavior, correlating it against the prior persistence event as part of the same attacker session.
+  * **Wazuh FIM (`syscheck`)** detected the file drop in real time, flagging that a new file had been added to the Downloads folder and capturing its full path.
 ---
-
-## 🧠 Key Takeaways & Defense-in-Depth Lessons
+##  Key Takeaways & Defense-in-Depth Lessons
 ## Key Takeaways
 
 This project demonstrates a core industry principle: defense in depth, and the real-world consequences of improperly configured systems and security controls. Firewalls are designed to monitor and enforce boundaries, but attackers routinely bypass them entirely through open service ports, exposed services, or compromised credentials, as this lab demonstrated when RDP brute force succeeded without ever touching the perimeter firewall.
