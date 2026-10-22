@@ -1,9 +1,9 @@
 # 04 - Post-Compromise Discovery & File Drop
 
 **Commands executed:**
-* **Discovery Command**
+* **Discovery Command:**
 `net users`
-* **File Drop**
+* **File Drop:**
 “You Are Hacked!” | Out-File -FilePath “C:\Users\Administrator\Downloads\Hacked.txt”
 
 
