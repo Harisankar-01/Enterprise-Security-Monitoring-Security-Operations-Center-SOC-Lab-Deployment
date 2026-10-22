@@ -1,9 +1,10 @@
 # 03 - Persistence via Unauthorized Local Administrator
 
 **Commands executed:**
-
-net user hacker123 password@123 /add
-net localgroup administrators hacker123 /add
+**New Account Add**
+`net user hacker123 password@123 /add`
+**Adding to administrators group**
+`net localgroup administrators hacker123 /add`
 
 **Timestamp of attack:** Oct 21, 2026 @ 20:24:15
 
@@ -59,5 +60,4 @@ True positive. Manually checked the local Administrators group on the server and
 - T1136.001 — Create Account: Local Account
 - T1098 — Account Manipulation (escalation into Administrators group)
 
-**Detection gap / observation:**
-Sysmon correctly identified `net.exe`/`net1.exe` activity as "account discovery" at Level 3, even though this instance was being used for account *creation*, not discovery. This suggests the Sysmon ruleset's description/classification for `net.exe` commands doesn't fully distinguish between enumeration (`net user`) and modification (`net user /add`) actions, both are tagged similarly despite different intent and risk. The privilege escalation itself (adding the account to Administrators) was only flagged as high-severity when the group-membership change was confirmed via Rule 60154, roughly 83 seconds after the account was created, worth noting as a short detection lag between account creation and the group-change confirmation.
+
